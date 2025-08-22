@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 AUTH_BASE = "https://auth.dev2.bonrepublic.com/realms/tenants"
 BASE_URL_DEV2 = "https://api.dev2.bonrepublic.com"
 
-# frontend client как у Postman
+# frontend client autorisation
 FRONTEND_CLIENT_ID = "frontend"
 REDIRECT_URI = "https://maxim-lvov.dev2.bonrepublic.com/"
 
@@ -43,16 +43,16 @@ def step_auth_as_user(context, username, password):
     r1.raise_for_status()
     login_action_url = _get_login_form_action(r1.text)
 
-    # 2) POST логин/пароль
+    # 2) POST login/password
     r2 = s.post(login_action_url, data={"username": username, "password": password}, allow_redirects=True)
 
-    # 3) Достаём code из redirect URL
+    # 3) take code from redirect URL
     parsed = urlparse(r2.url)
     code_list = parse_qs(parsed.query).get("code")
     assert code_list, f"Authorization code not found in redirect url: {r2.url}"
     code = code_list[0]
 
-    # 4) Обмениваем code на токен
+    # 4) exchange code for token
     token_url = f"{AUTH_BASE}/protocol/openid-connect/token"
     data = {
         "grant_type": "authorization_code",
@@ -84,7 +84,7 @@ def step_remember_admin_auth(context):
 def step_create_review_session_dev2(context):
     assert hasattr(context, "headers"), "Not authenticated. Call the auth step first."
 
-    body = json.loads(context.text)  # JSON из блока """..."""
+    body = json.loads(context.text)  # JSON from block """..."""
     url = f"{BASE_URL_DEV2}/performance-reviews/v1/review-sessions/"
     headers = {**context.headers, "Content-Type": "application/json"}
 

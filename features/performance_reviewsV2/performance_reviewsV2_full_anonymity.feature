@@ -1,7 +1,7 @@
 Feature: Performance Reviews V2 on dev2 anonymity check
 
   Scenario: Create session as admin, verify anonymity as regular, then delete
-    # 1) Логин админом и создаём анонимную сессию
+    # 1) login as admin
     Given I authenticate on dev2 as "maxim.lvov+admin@bonrepublic.com" with password "1qaz@WSX"
     When I create a review session on dev2 with payload:
     """
@@ -44,13 +44,13 @@ Feature: Performance Reviews V2 on dev2 anonymity check
     """
     Then the response status code should be 201
 
-    # 2) Логин regular и проверяем, что заголовки скрыты
+    # 2) check by regular user that there is no titles for forms
     Given I authenticate on dev2 as "maxim.lvov+regular@bonrepublic.com" with password "1qaz@WSX"
     When I fetch the created review session on dev2
     Then the response status code should be 200
     And participants titles should not be visible to the current user
 
-    # 3) Вновь логинимся админом и удаляем сессию
+    # 3) login as admin remove this session
     Given I authenticate on dev2 as "maxim.lvov+admin@bonrepublic.com" with password "1qaz@WSX"
     When I delete the created review session on dev2
     Then the response status code should be 204
